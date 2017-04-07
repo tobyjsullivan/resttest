@@ -13,17 +13,21 @@ import scala.util.{Failure, Success, Try}
 object TransactionPageProtocol extends DefaultJsonProtocol {
   private val dateFormat = ISODateTimeFormat.date()
 
+  /**
+    * This TransactionFormat object contains the logic for parsing individual Transactions from the Bench API.
+    */
   implicit object TransactionFormat extends RootJsonFormat[Transaction] {
     override def read(json: JsValue): Transaction =
+      // Extract only the relevant fields needed for the Transaction object
       json.asJsObject.getFields("Date", "Amount") match {
-        case Seq(JsString(dateString), JsString(amountString)) => tryParseTransaction(dateString, amountString) match {
-          case Success(txn) => txn
-          case Failure(e) => deserializationError("Unexepected transaction data.", e)
-        }
-        case _ => deserializationError("Expected Transaction")
+        case Seq(JsString(dateString), JsString(amountString)) =>
+          tryParseTransactionElements(dateString, amountString).recoverWith[Transaction]{
+            case e => deserializationError("Unexepected transaction data.", e)
+          }.get
+        case _ => deserializationError("Expected a transaction.")
       }
 
-    private def tryParseTransaction(dateString: String, amountString: String): Try[Transaction] = Try {
+    private def tryParseTransactionElements(dateString: String, amountString: String): Try[Transaction] = Try {
       Transaction(
         dateFormat.parseLocalDate(dateString),
         java.lang.Double.parseDouble(amountString)
@@ -34,6 +38,10 @@ object TransactionPageProtocol extends DefaultJsonProtocol {
     override def write(obj: Transaction): JsValue = ???
   }
 
+  /**
+    * This TransactionPageFormat object contains the logic for parsing a complete page of transactions from
+    * the Bench API.
+    */
   implicit object TransactionPageFormat extends RootJsonFormat[TransactionPage] {
     override def read(json: JsValue): TransactionPage =
       json.asJsObject.getFields("transactions") match {
