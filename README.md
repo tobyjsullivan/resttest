@@ -58,6 +58,20 @@ to remain at 10 transactions/page.
 assume that the last page has been reached when the next page returns a
 404.
 
+### Halt on HTTP Error
+
+I made the decision to take a fail-fast philosophy and halt the
+application on unexpected error responses from the API. Such errors
+include 5XX-level server and 4XX-level errors other than 404. In either
+of these cases, it is implied that our
+code is incorrect (e.g., 400 BadRequest) or the server is experiencing
+difficulties. In either case, there is no reasonable way for the
+application to continue with the calculations without the missing data as
+any results would be suspect.
+
+One potential improvement would be to auto-retry on 5XX-level failures
+in hope that the problem would self-correct.
+
 ### Streaming
 
 I ultimately opted for a stream-based architecture for this application.
