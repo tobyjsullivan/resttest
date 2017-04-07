@@ -11,8 +11,10 @@ object App {
     val fetcher: JsonFetcher = JsonFetcherImpl
     val bench = new BenchAdapter(fetcher)
 
-    val stmt: Statement = Statement(bench.allTransactions().toSet)
+    // Get a Statement object from the Bench adapter
+    val stmt: Statement = Statement(bench.allTransactions())
 
+    // Format the statement and print to screen
     println(DisplayFormat.format(stmt))
   }
 }

@@ -23,18 +23,8 @@ class StatementSpec extends FunSpec with Matchers {
   describe("Statement") {
     describe("with multiple transactions") {
       val statement = Statement(
-        Set(testTxn1, testTxn2, testTxn3)
+        testTxn1 #:: testTxn2 #:: testTxn3 #:: Stream.empty
       )
-      describe(".transactionsByDate") {
-        it("should return a map with all dates and transactions") {
-          val result = statement.transactionsByDate
-
-          result should be (Map(
-            new LocalDate(2013, 12, 22) -> Set(testTxn1),
-            new LocalDate(2013, 12, 21) -> Set(testTxn2, testTxn3)
-          ))
-        }
-      }
 
       describe(".totalBalance") {
         it("should be the sum of all transaction") {
