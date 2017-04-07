@@ -5,7 +5,7 @@ import net.tobysullivan.resttest.models.Transaction
 import org.joda.time.format.ISODateTimeFormat
 import spray.json._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Try}
 
 /**
   * This is a protocol for use with spray-json which defines the JSON formats of the Bench API.

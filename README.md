@@ -45,7 +45,25 @@ The basic packages for the project are as follows:
 
 ## Design Decisions
 
-### Streaming vs Futures
+### Streaming
+
+I ultimately opted for a stream-based architecture for this application.
+The basic idea is that we fetch and parse pages from the Bench API one
+at a time and, as we do, produce a constant Stream of Transaction
+objects which can be mapped, filtered, and iterated over. This allows
+us to do easily perform our aggregation functions (calculate total
+balance) in a manner which consumes O(1) memory.
+
+The alternative solution would be to follow a Map-Reduce pattern. This
+approach would generally be faster with concurrency; however, the
+trade-off would be
+unpredictable memory consumption which could be a significant issue for
+either very large statements (as it might lead to swapping and negative
+performance) or situations where multiple client statements are being
+read on the same machine (although that's not possible with the current
+API).
+
+### Lack of Concurrency
 
 One design decision you'll likely notice immediately is a lack of
 Futures, Actors, or other concurrency mechanisms.
