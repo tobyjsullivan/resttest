@@ -6,7 +6,7 @@ import org.joda.time.LocalDate
 import org.scalatest.{FunSpec, Matchers}
 import spray.json._
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class BenchAdapterSpec extends FunSpec with Matchers {
   class TestFetcher(responder: (String) => Try[Option[JsValue]]) extends JsonFetcher {
@@ -87,24 +87,53 @@ class BenchAdapterSpec extends FunSpec with Matchers {
 
 
   describe("BenchAdapter") {
-    describe("when there are three pages of results") {
-      val fetcher = new TestFetcher({
-        case url if url.endsWith("/transactions/1.json") => Success(Some(testPage1.parseJson))
-        case url if url.endsWith("/transactions/2.json") => Success(Some(testPage2.parseJson))
-        case url if url.endsWith("/transactions/3.json") => Success(Some(testPage3.parseJson))
-        case _ => Success(None)
-      })
-      val bench = new BenchAdapter(fetcher)
+    describe(".allTransactions") {
+      describe("when there are three pages of results") {
+        val fetcher = new TestFetcher({
+          case url if url.endsWith("/transactions/1.json") => Success(Some(testPage1.parseJson))
+          case url if url.endsWith("/transactions/2.json") => Success(Some(testPage2.parseJson))
+          case url if url.endsWith("/transactions/3.json") => Success(Some(testPage3.parseJson))
+          case _ => Success(None)
+        })
+        val bench = new BenchAdapter(fetcher)
 
-      describe(".allTransactions") {
-        val txns = bench.allTransactions().force
+        it("should return a set including all transactions") {
+          val txns = bench.allTransactions().force
 
-        txns.length should be (7)
+          txns.length should be(7)
 
-        txns should contain (Transaction(new LocalDate(2013, 12, 21), -8.1))
-        txns should contain (Transaction(new LocalDate(2013, 12, 19), -200.0))
-        txns should contain (Transaction(new LocalDate(2013, 12, 18), -9.55))
-        txns should contain (Transaction(new LocalDate(2013, 12, 17), 907.85))
+          txns should contain(Transaction(new LocalDate(2013, 12, 21), -8.1))
+          txns should contain(Transaction(new LocalDate(2013, 12, 19), -200.0))
+          txns should contain(Transaction(new LocalDate(2013, 12, 18), -9.55))
+          txns should contain(Transaction(new LocalDate(2013, 12, 17), 907.85))
+        }
+      }
+
+      describe("when there are no pages of results") {
+        val fetcher = new TestFetcher(_ => Success(None))
+        val bench = new BenchAdapter(fetcher)
+
+        it("should return an empty stream") {
+          val txns = bench.allTransactions().force
+
+          txns.length should be (0)
+        }
+      }
+
+      describe("when the server returns an error") {
+        val fetcher = new TestFetcher({
+          case url if url.endsWith("/transactions/1.json") => Success(Some(testPage1.parseJson))
+          case url if url.endsWith("/transactions/2.json") => Failure(new Exception("Test Exception"))
+          case url if url.endsWith("/transactions/3.json") => Success(Some(testPage3.parseJson))
+          case _ => Success(None)
+        })
+        val bench = new BenchAdapter(fetcher)
+
+        it ("should bubble up the exception") {
+          assertThrows[Exception] {
+            bench.allTransactions().force
+          }
+        }
       }
     }
   }

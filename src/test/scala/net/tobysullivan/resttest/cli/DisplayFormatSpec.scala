@@ -29,6 +29,22 @@ class DisplayFormatSpec extends FunSpec with Matchers {
             """.stripMargin.trim)
         }
       }
+
+      describe("with an empty statement") {
+        val statement = Statement(Stream.empty)
+
+        it("should display a zero balance and a notice") {
+          val out = DisplayFormat.format(statement)
+
+          out.trim should be (
+            """
+              |Total Balance: $0.00
+              |
+              |Daily Balances
+              |-- No transactions found. --
+            """.stripMargin.trim)
+        }
+      }
     }
   }
 }

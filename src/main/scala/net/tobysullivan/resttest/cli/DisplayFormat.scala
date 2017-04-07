@@ -16,11 +16,14 @@ object DisplayFormat {
 
   private def moneyFmt(value: Double): String = "$%.2f".format(value)
 
-  private def dailyBalances(balances: Map[LocalDate, Double]): String = {
-    val sortedBalances = balances.toSeq.sortWith((kv1, kv2)  => kv1._1.isAfter(kv2._1))
+  private def dailyBalances(balances: Map[LocalDate, Double]): String = balances match {
+    case _ if balances.isEmpty =>
+      "-- No transactions found. --"
+    case _ =>
+      val sortedBalances = balances.toSeq.sortWith((kv1, kv2)  => kv1._1.isAfter(kv2._1))
 
-    sortedBalances.map {
-      case (date, amount) => s"${dateFormat.print(date)}: ${moneyFmt(amount)}"
-    }.mkString("\n")
+      sortedBalances.map {
+        case (date, amount) => s"${dateFormat.print(date)}: ${moneyFmt(amount)}"
+      }.mkString("\n")
   }
 }
