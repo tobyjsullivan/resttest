@@ -55,8 +55,7 @@ date or otherwise.
 * The exact page size is undefined and, therefore, should not be assumed
 to remain at 10 transactions/page.
 * As an alternative to referencing `totalCount`, it is reasonable to
-assume that the last page has been reached when the next page returns a
-404.
+assume that the last page has been reached when the next page returns a 404.
 
 ### Halt on HTTP Error
 
@@ -78,7 +77,7 @@ I ultimately opted for a stream-based architecture for this application.
 The basic idea is that we fetch and parse pages from the Bench API one
 at a time and, as we do, produce a constant Stream of Transaction
 objects which can be mapped, filtered, and iterated over. This allows
-us to do easily perform our aggregation functions (calculate total
+us to perform our aggregation functions (calculate total
 balance) in a manner which consumes O(1) memory.
 
 The alternative solution would be to follow a Map-Reduce pattern. This
