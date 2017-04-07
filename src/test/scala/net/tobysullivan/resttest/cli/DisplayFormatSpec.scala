@@ -23,8 +23,8 @@ class DisplayFormatSpec extends FunSpec with Matchers {
               |Total Balance: $-30.53
               |
               |Daily Balances
-              |2013-12-25: $20.76
-              |2013-12-22: $-37.65
+              |2013-12-25: $-30.53
+              |2013-12-22: $-51.29
               |2013-12-21: $-13.64
             """.stripMargin.trim)
         }
