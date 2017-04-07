@@ -25,6 +25,11 @@ You can run the unit tests for this project easily as well.
 
     `sbt test`
 
+## Configuration
+
+You can configure basic App parameters (such as the API base URL) by
+modifying `src/main/resources/application.conf`.
+
 ## Design Decisions
 
 ### Streaming vs Futures
