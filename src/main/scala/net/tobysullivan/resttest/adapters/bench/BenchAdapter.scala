@@ -4,10 +4,14 @@ import net.tobysullivan.resttest.adapters.bench.models.TransactionPage
 import net.tobysullivan.resttest.adapters.http.JsonFetcher
 import net.tobysullivan.resttest.models.Transaction
 
+import com.typesafe.config.ConfigFactory
+
 import scala.util.{Failure, Success}
 
 class BenchAdapter(fetcher: JsonFetcher) {
-  private val API_BASE_URL = "http://resttest.bench.co"
+  private val conf = ConfigFactory.load()
+
+  private val API_BASE_URL = conf.getString("bench.api.baseUrl")
   private val STARTING_PAGE = 1
 
   def allTransactions(): Stream[Transaction] = pages.flatMap(_.toStream)
