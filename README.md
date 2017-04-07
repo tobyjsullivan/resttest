@@ -30,6 +30,19 @@ You can run the unit tests for this project easily as well.
 You can configure basic App parameters (such as the API base URL) by
 modifying `src/main/resources/application.conf`.
 
+## Navigating the Code
+
+The basic packages for the project are as follows:
+
+| Package | Description |
+|---|---|
+|net.tobysullivan.resttest| The main entry point to the application.|
+|adapters| This package contains all code relevant to connecting to external systems. |
+|adapters.bench| This package and subpackages contains all code specific to querying the Bench API at http://resttest.bench.co.|
+|adapters.http| This package contains HTTP client code that could, presumably, be shared between multiple adapters.|
+|cli| This code is specific to the App's CLI presentation mode (currently the only available mode).|
+|models| These are models relevant to the entire app.|
+
 ## Design Decisions
 
 ### Streaming vs Futures
