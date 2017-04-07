@@ -45,6 +45,19 @@ The basic packages for the project are as follows:
 
 ## Design Decisions
 
+### Interpretation of Spec
+
+My reading of the [assessment project](http://resttest.bench.co) spec
+lead me to believe the following:
+
+* There is no reason to believe that transactions will be ordered by
+date or otherwise.
+* The exact page size is undefined and, therefore, should not be assumed
+to remain at 10 transactions/page.
+* As an alternative to referencing `totalCount`, it is reasonable to
+assume that the last page has been reached when the next page returns a
+404.
+
 ### Streaming
 
 I ultimately opted for a stream-based architecture for this application.
@@ -62,6 +75,12 @@ either very large statements (as it might lead to swapping and negative
 performance) or situations where multiple client statements are being
 read on the same machine (although that's not possible with the current
 API).
+
+Note: There is no benefit to the current streaming design if each page
+has a very large number of transactions. The working assumption is that pages will
+always contain a limited number of transactions (a thousand or fewer, say)
+ and very large statements will be expressed through a very large number
+ of pages.
 
 ### Lack of Concurrency
 
