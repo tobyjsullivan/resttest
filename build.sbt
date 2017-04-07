@@ -1,5 +1,7 @@
 // Dependencies
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1"
+val jodaTime = "joda-time" % "joda-time" % "2.9.9"
+val sprayJson = "io.spray" %% "spray-json" % "1.3.3"
 
 lazy val root = (project in file(".")).
   settings(
@@ -8,6 +10,8 @@ lazy val root = (project in file(".")).
     scalaVersion := "2.12.1",
 
     libraryDependencies ++= Seq(
-      scalaTest
+      scalaTest,
+      jodaTime,
+      sprayJson
     )
   )
