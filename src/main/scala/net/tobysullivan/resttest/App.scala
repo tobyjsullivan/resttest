@@ -1,4 +1,4 @@
-
+package net.tobysullivan.resttest
 
 object App {
   def main(args: Array[String]) {
