@@ -17,26 +17,26 @@ case class Statement(transactions: Stream[Transaction]) {
 
   // Returns an ordered set (most recent date first) of mappings from each date to the accrued balance
   lazy val accruedDailyBalances: Seq[(LocalDate, Double)] = {
-    // Sort the list of daily balances by date
-    val sortedMappings = balancesByDate.toSeq.sortWith((kv1, kv2) => kv1._1.isBefore(kv2._1))
+    // Get a sorted list of all dates represented in the statement
+    val dates = datesCovered()
 
     // Build up a new list of mappings from each date to the ACCRUED total on that date
-    val (_, accruedBalances) = sortedMappings.foldLeft(Tuple2(0.0, Seq[(LocalDate, Double)]())) {
-      case ((accruedBalance, priorBalances), (currentDate, currentBalance)) =>
-        val newBalance = accruedBalance + currentBalance
-
-        (newBalance, priorBalances :+ (currentDate -> newBalance))
+    val (_, accruedBalances) = dates.foldLeft(0.0, Seq[(LocalDate, Double)]()) {
+      case ((accruedBalance, balances), date) =>
+        val updatedBalance = accruedBalance + totalsByDate.getOrElse(date, 0.0)
+        (updatedBalance, balances :+ (date -> updatedBalance))
     }
 
     // Reverse the list so that most recent date is at head of list
     accruedBalances.reverse
   }
 
-  private lazy val balancesByDate: Map[LocalDate, Double] = transactionsByDate.mapValues(_.foldLeft(0.0) { (sum, txn) => sum + txn.amount })
-
-  private lazy val transactionsByDate: Map[LocalDate, Set[Transaction]] =
-    transactions.foldLeft(Map[LocalDate, Set[Transaction]]()){ (m, txn) =>
-      val currentSet: Set[Transaction] = m.getOrElse(txn.date, Set[Transaction]())
-      m + (txn.date -> (currentSet + txn))
+  // This iterates through the stream and calculates totals for each date without having to hold all transactions in memory
+  private lazy val totalsByDate: Map[LocalDate, Double] =
+    transactions.foldLeft(Map[LocalDate, Double]()) { (m, txn) =>
+      val currentTotal: Double = m.getOrElse(txn.date, 0.0)
+      m + (txn.date -> (currentTotal + txn.amount))
     }
+
+  private def datesCovered(): Seq[LocalDate] = totalsByDate.keys.toSeq.sortWith((d1, d2) => d1.isBefore(d2))
 }
